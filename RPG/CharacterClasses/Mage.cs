@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace RPG.CharacterClasses
+namespace RPG
 {
     class Mage : Character
     {

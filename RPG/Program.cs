@@ -8,6 +8,7 @@ namespace RPG
         {
             Warrior warrior = new Warrior("Valdemar");
             warrior.LevelUp();
+
             warrior.CharacterStats();
         }
     }
