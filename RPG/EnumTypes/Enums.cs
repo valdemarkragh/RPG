@@ -14,7 +14,7 @@ namespace RPG
         STAFF,
         SWORD,
         WAND
-    };
+    }
 
     public enum ArmorTypes
     {
