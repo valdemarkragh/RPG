@@ -6,9 +6,15 @@ using System.Threading.Tasks;
 
 namespace RPG
 {
-    class WeaponAttributes
+    public class WeaponAttributes
     {
         public int Damage { get; set; }
         public double AttackSpeed { get; set; }
+
+        public WeaponAttributes(int Damage, double AttackSpeed)
+        {
+            this.Damage = Damage;
+            this.AttackSpeed = AttackSpeed;
+        }
     }
 }
