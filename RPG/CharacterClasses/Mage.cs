@@ -32,8 +32,9 @@ namespace RPG
 
         public override void CalcDamage()
         {
+            PrimaryAttributes totalAttributes = CalcTotalAttributes();
             double WeaponDps = CalcWeaponDPS();
-            Damage = Math.Round(WeaponDps * (1 + (PrimaryAttributes.Intelligence / 100)), 2);
+            Damage = Math.Round(WeaponDps * (1 + (totalAttributes.Intelligence / 100)), 2);
         }
     }
 }

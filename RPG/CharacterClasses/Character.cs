@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace RPG
 {
     public abstract class Character
     {
-        public string Name { get; set; }
-        public int Level { get; set; }
-        public double Damage { get; set; }
-        public int Health { get; set; }
+        public string Name { get; protected set; }
+        protected int Level { get; set; }
+        protected double Damage { get; set; }
         public PrimaryAttributes PrimaryAttributes { get; set; } = new PrimaryAttributes();
+        public PrimaryAttributes BasePrimaryAttributes { get; set; } = new PrimaryAttributes();
         public SecondaryAttributes SecondaryAttributes { get; set; } = new SecondaryAttributes();
         public List<WeaponTypes> AllowedWeapons { get; set; }
         public List<ArmorTypes> AllowedArmor { get; set; }
@@ -27,7 +28,6 @@ namespace RPG
         {
             Name = name;
             Level = 1;
-            Damage = 1;
         }
 
         /// <summary>
@@ -36,7 +36,20 @@ namespace RPG
         /// If negative number is passed throws ArgumentException.
         /// </summary>
         /// <param name="lvl"></param>
-        public abstract void LevelUp(int lvl);
+        public virtual void LevelUp(int lvl) {
+            try
+            {
+                if(lvl < 0)
+                {
+                    throw new ArgumentException();
+                }
+                Level += lvl;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
 
         /// <summary>
         /// Calculates the characters total damage based on weapon and primary attribute.
@@ -72,7 +85,6 @@ namespace RPG
         {
             if (AllowedArmor.Contains(Armor.ArmorType) && Level >= Armor.ItemLevel)
             {
-                AddArmorAttributes(Armor);
                 Equipment[Armor.ItemSlot] = Armor;
                 Console.WriteLine("New armor equipped!");
             }
@@ -141,41 +153,49 @@ namespace RPG
 
         /// <summary>
         /// Calculates the secondary attributes of the character.
-        /// The health is calculated by multiplying the characters vitality with 10.
-        /// The armor is calculated by adding the strength and dexterity of the character.
+        /// The health is calculated by multiplying the characters totalvitality with 10.
+        /// The armor is calculated by adding the totalstrength and totaldexterity of the character.
         /// The elemental resistance is equal to the intelligence of the character.
         /// </summary>
         public void CalcSecondaryAttributes()
         {
-            SecondaryAttributes.Health = PrimaryAttributes.Vitality * 10;
-            SecondaryAttributes.ArmorRating = PrimaryAttributes.Strength + PrimaryAttributes.Dexterity;
-            SecondaryAttributes.ElementalResistance = PrimaryAttributes.Intelligence;
+            PrimaryAttributes totalAttributes = CalcTotalAttributes();
+
+            SecondaryAttributes.Health = totalAttributes.Vitality * 10;
+            SecondaryAttributes.ArmorRating = totalAttributes.Strength + totalAttributes.Dexterity;
+            SecondaryAttributes.ElementalResistance = totalAttributes.Intelligence;
         }
 
         /// <summary>
-        /// Adds the new equipped armor attributes to the characters primary attributes.
-        /// The method checks if theres already an equipped item on the current slot.
-        /// If the condition is met then it proceeds to minus the new armors attributes with the previous armors attributes.
-        /// Else it adds the equipped armors attributes.
+        /// 
         /// </summary>
-        /// <param name="Armor"></param>
-        public void AddArmorAttributes(Armor Armor)
+        /// <returns></returns>
+        public PrimaryAttributes CalcTotalAttributes()
         {
-            if (Equipment[Armor.ItemSlot].ItemName != null)
+            PrimaryAttributes primaryAttributes = CalcPrimaryAttributes();
+            PrimaryAttributes totalAttributes = BasePrimaryAttributes + primaryAttributes;
+
+            return totalAttributes;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public PrimaryAttributes CalcPrimaryAttributes()
+        {
+            PrimaryAttributes calculatedStats = new PrimaryAttributes();
+            List<Armor> armors = Equipment.Where(item => item.Key != ArmorSlots.WEAPON).Select(item => item.Value as Armor).ToList();
+
+            foreach (Armor armor in armors)
             {
-                PrimaryAttributes.Vitality += Armor.ArmorAttributes.Vitality - Equipment[Armor.ItemSlot].ArmorAttributes.Vitality;
-                PrimaryAttributes.Strength += Armor.ArmorAttributes.Strength - Equipment[Armor.ItemSlot].ArmorAttributes.Strength;
-                PrimaryAttributes.Dexterity += Armor.ArmorAttributes.Dexterity - Equipment[Armor.ItemSlot].ArmorAttributes.Dexterity;
-                PrimaryAttributes.Intelligence += Armor.ArmorAttributes.Intelligence - Equipment[Armor.ItemSlot].ArmorAttributes.Intelligence;
+                if(armor.ItemName != null)
+                {
+                    calculatedStats += armor.ArmorAttributes;
+                }
             }
-            else
-            {
-                PrimaryAttributes.Vitality += Armor.ArmorAttributes.Vitality;
-                PrimaryAttributes.Strength += Armor.ArmorAttributes.Strength;
-                PrimaryAttributes.Dexterity += Armor.ArmorAttributes.Dexterity;
-                PrimaryAttributes.Intelligence += Armor.ArmorAttributes.Intelligence;
-            }
-            CalcSecondaryAttributes();
+
+            return calculatedStats;
         }
 
         /// <summary>
@@ -184,19 +204,21 @@ namespace RPG
         public void CharacterStats()
         {
             CalcDamage();
+            CalcSecondaryAttributes();
+            PrimaryAttributes totalAttributes = CalcTotalAttributes();
+
             StringBuilder Stats = new StringBuilder();
             Stats.AppendLine("Character stats: ");
             Stats.AppendLine("Name: " + Name);
             Stats.AppendLine("Level: " + Level);
-            Stats.AppendLine("Vitality: " + PrimaryAttributes.Vitality);
-            Stats.AppendLine("Strength: " + PrimaryAttributes.Strength);
-            Stats.AppendLine("Dexterity: " + PrimaryAttributes.Dexterity);
-            Stats.AppendLine("Intelligence: " + PrimaryAttributes.Intelligence);
+            Stats.AppendLine("Vitality: " + totalAttributes.Vitality);
+            Stats.AppendLine("Strength: " + totalAttributes.Strength);
+            Stats.AppendLine("Dexterity: " + totalAttributes.Dexterity);
+            Stats.AppendLine("Intelligence: " + totalAttributes.Intelligence);
             Stats.AppendLine("Health: " + SecondaryAttributes.Health);
             Stats.AppendLine("Armor Rating: " + SecondaryAttributes.ArmorRating);
             Stats.AppendLine("Elemental Resistance: " + SecondaryAttributes.ElementalResistance);
             Stats.AppendLine("DPS: " + Damage);
-
 
             Console.WriteLine(Stats);
         }

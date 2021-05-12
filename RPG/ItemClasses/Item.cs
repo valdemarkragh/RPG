@@ -11,7 +11,6 @@ namespace RPG
         public string ItemName { get; set; }
         public int ItemLevel { get; set; }
         public ArmorSlots ItemSlot { get; set; }
-        public PrimaryAttributes ArmorAttributes { get; set; }
         public WeaponAttributes WeaponAttributes { get; set; }
 
         public Item() { }
