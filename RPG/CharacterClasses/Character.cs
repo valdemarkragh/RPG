@@ -8,7 +8,7 @@ namespace RPG
     public abstract class Character
     {
         public string Name { get; protected set; }
-        protected int Level { get; set; }
+        public int Level { get; protected set; }
         protected double Damage { get; set; }
         public PrimaryAttributes PrimaryAttributes { get; set; } = new PrimaryAttributes();
         public PrimaryAttributes BasePrimaryAttributes { get; set; } = new PrimaryAttributes();
@@ -140,11 +140,12 @@ namespace RPG
         public double CalcWeaponDPS()
         {
             double WeaponDPS = 1;
+            Weapon weapon = Equipment.Where(item => item.Key == ArmorSlots.WEAPON).Select(item => item.Value as Weapon).FirstOrDefault();
 
-            if (Equipment[ArmorSlots.WEAPON].ItemName != null)
+            if (weapon.ItemName != null)
             {
-                double WeaponSpeed = Equipment[ArmorSlots.WEAPON].WeaponAttributes.AttackSpeed;
-                int WeaponDamage = Equipment[ArmorSlots.WEAPON].WeaponAttributes.Damage;
+                double WeaponSpeed = weapon.WeaponAttributes.AttackSpeed;
+                int WeaponDamage = weapon.WeaponAttributes.Damage;
                 WeaponDPS = WeaponDamage * WeaponSpeed;
             }
 
@@ -167,9 +168,10 @@ namespace RPG
         }
 
         /// <summary>
-        /// 
+        /// Calculates the total attributes of the character.
+        /// The calculation is based on the primaryattributes and the baseprimaryattributes.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>totalAttributes</returns>
         public PrimaryAttributes CalcTotalAttributes()
         {
             PrimaryAttributes primaryAttributes = CalcPrimaryAttributes();
@@ -179,9 +181,10 @@ namespace RPG
         }
 
         /// <summary>
-        /// 
+        /// Calculates the primary attributes based on the equipped armor.
+        /// If an item is equipped in a slot, proceed to add the armor attributes to the calculatedStats object.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>calculatedStats</returns>
         public PrimaryAttributes CalcPrimaryAttributes()
         {
             PrimaryAttributes calculatedStats = new PrimaryAttributes();

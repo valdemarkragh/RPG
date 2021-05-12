@@ -9,24 +9,20 @@ namespace RPG
         {
             AllowedArmor = new List<ArmorTypes> { ArmorTypes.LEATHER, ArmorTypes.MAIL };
             AllowedWeapons = new List<WeaponTypes> { WeaponTypes.BOW };
-            PrimaryAttributes.Vitality = 8;
-            PrimaryAttributes.Strength = 1;
-            PrimaryAttributes.Dexterity = 7;
-            PrimaryAttributes.Intelligence = 1;
+            BasePrimaryAttributes.Vitality = 8;
+            BasePrimaryAttributes.Strength = 1;
+            BasePrimaryAttributes.Dexterity = 7;
+            BasePrimaryAttributes.Intelligence = 1;
             CalcSecondaryAttributes();
         }
 
         public override void LevelUp(int lvl = 1)
         {
-            if (lvl < 0)
-            {
-                throw new ArgumentException();
-            }
-            Level += lvl;
-            PrimaryAttributes.Vitality += 2;
-            PrimaryAttributes.Strength += 1;
-            PrimaryAttributes.Dexterity += 5;
-            PrimaryAttributes.Intelligence += 1;
+            base.LevelUp(lvl);
+            BasePrimaryAttributes.Vitality += 2;
+            BasePrimaryAttributes.Strength += 1;
+            BasePrimaryAttributes.Dexterity += 5;
+            BasePrimaryAttributes.Intelligence += 1;
             CalcSecondaryAttributes();
         }
 
