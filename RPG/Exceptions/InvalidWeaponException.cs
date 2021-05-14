@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace RPG
 {
-    class InvalidWeaponException : Exception
+    public class InvalidWeaponException : Exception
     {
         public InvalidWeaponException(string message) : base(message)
         {
 
         }
+
+        public override string Message => "You are not able to equip that weapon";
     }
 }

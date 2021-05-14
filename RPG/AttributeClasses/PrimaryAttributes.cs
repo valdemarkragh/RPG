@@ -16,6 +16,7 @@
                 Intelligence = a.Intelligence + b.Intelligence,
                 Vitality = a.Vitality + b.Vitality
             };
+
             return primaryAttributes;
         }
     }

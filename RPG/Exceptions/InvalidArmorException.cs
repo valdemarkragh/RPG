@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace RPG
 {
-    class InvalidArmorException : Exception
+    public class InvalidArmorException : Exception
     {
         public InvalidArmorException(string message) : base(message)
         {
 
         }
+
+        public override string Message => "You are not able to equip that armor";
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace RPG
 {
-    class Mage : Character
+    public class Mage : Character
     {
         public Mage(string Name) : base(Name)
         {
@@ -25,12 +25,12 @@ namespace RPG
             BasePrimaryAttributes.Intelligence += 5;
             CalcSecondaryAttributes();
         }
-        
+
         public override void CalcDamage()
         {
             PrimaryAttributes totalAttributes = CalcTotalAttributes();
             double WeaponDps = CalcWeaponDPS();
-            Damage = Math.Round(WeaponDps * (1 + (totalAttributes.Intelligence / 100)), 2);
+            Damage = WeaponDps * (1 + (totalAttributes.Intelligence / 100));
         }
     }
 }

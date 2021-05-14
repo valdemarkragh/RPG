@@ -30,7 +30,7 @@ namespace RPG
         {
             PrimaryAttributes totalAttributes = CalcTotalAttributes();
             double WeaponDps = CalcWeaponDPS();
-            Damage = Math.Round(WeaponDps * (1 + (totalAttributes.Dexterity / 100)), 2);
+            Damage = WeaponDps * (1 + (totalAttributes.Dexterity / 100));
         }
     }
 }

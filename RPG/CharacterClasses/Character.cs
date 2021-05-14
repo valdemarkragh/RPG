@@ -9,19 +9,19 @@ namespace RPG
     {
         public string Name { get; protected set; }
         public int Level { get; protected set; }
-        protected double Damage { get; set; }
-        public PrimaryAttributes PrimaryAttributes { get; set; } = new PrimaryAttributes();
-        public PrimaryAttributes BasePrimaryAttributes { get; set; } = new PrimaryAttributes();
-        public SecondaryAttributes SecondaryAttributes { get; set; } = new SecondaryAttributes();
-        public List<WeaponTypes> AllowedWeapons { get; set; }
-        public List<ArmorTypes> AllowedArmor { get; set; }
+        public double Damage { get; protected set; }
+        public PrimaryAttributes PrimaryAttributes { get; protected set; } = new PrimaryAttributes();
+        public PrimaryAttributes BasePrimaryAttributes { get; protected set; } = new PrimaryAttributes();
+        public SecondaryAttributes SecondaryAttributes { get; protected set; } = new SecondaryAttributes();
+        protected List<WeaponTypes> AllowedWeapons { get; set; }
+        protected List<ArmorTypes> AllowedArmor { get; set; }
 
         public Dictionary<ArmorSlots, Item> Equipment { get; set; } = new Dictionary<ArmorSlots, Item>
         {
-            {ArmorSlots.HEAD, new Armor()},
-            {ArmorSlots.BODY, new Armor()},
-            {ArmorSlots.LEGS, new Armor()},
-            {ArmorSlots.WEAPON, new Weapon()}
+            {ArmorSlots.HEAD, null},
+            {ArmorSlots.BODY, null},
+            {ArmorSlots.LEGS, null},
+            {ArmorSlots.WEAPON, null}
         };
 
         public Character(string name)
@@ -36,19 +36,13 @@ namespace RPG
         /// If negative number is passed throws ArgumentException.
         /// </summary>
         /// <param name="lvl"></param>
-        public virtual void LevelUp(int lvl) {
-            try
+        public virtual void LevelUp(int lvl)
+        {
+            if (lvl <= 0)
             {
-                if(lvl < 0)
-                {
-                    throw new ArgumentException();
-                }
-                Level += lvl;
+                throw new ArgumentException();
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            Level += lvl;
         }
 
         /// <summary>
@@ -59,76 +53,40 @@ namespace RPG
 
         /// <summary>
         /// Equips the given instance of the armor class.
-        /// Catches the custom InvalidArmorException if error occours.
-        /// </summary>
-        /// <param name="Armor"></param>
-        public void EquipArmor(Armor Armor)
-        {
-            try
-            {
-                ValidateArmor(Armor);
-            }
-            catch (InvalidArmorException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Validates the given instance of the armor class.
         /// The method checks if the AllowedArmor List contains the Type of the armor
-        /// and if the characters level is above or equal to the itemlevel of the armor
-        /// Throws InvalidWeaponException if the condition is not fulfilled
+        /// and if the characters level is above or equal to the itemlevel of the armor.
+        /// Throws InvalidWeaponException if the condition is not fulfilled.
         /// </summary>
         /// <param name="Armor"></param>
-        public void ValidateArmor(Armor Armor)
+        public string EquipArmor(Armor Armor)
         {
             if (AllowedArmor.Contains(Armor.ArmorType) && Level >= Armor.ItemLevel)
             {
                 Equipment[Armor.ItemSlot] = Armor;
-                Console.WriteLine("New armor equipped!");
+
+                return "New armor equipped!";
             }
-            else
-            {
-                throw new InvalidWeaponException("You are not able to use this Weapon");
-            }
+
+            throw new InvalidArmorException("You are not able to use this Armor");
         }
 
         /// <summary>
         /// Equips the given instance of the Weapon class.
-        /// Catches the custom InvalidWeaponException if error occours.
-        /// </summary>
-        /// <param name="Weapon"></param>
-        public void EquipWeapon(Weapon Weapon)
-        {
-            try
-            {
-                ValidateWeapon(Weapon);
-            }
-            catch (InvalidWeaponException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Validates the given instance of the weapon class.
         /// The method checks if the AllowedWeapons List contains the Type of the weapon.
         /// and if the characters level is above or equal to the itemlevel of the weapon.
         /// Throws InvalidWeaponException if the condition is not fulfilled.
         /// </summary>
-        /// <param name="Armor"></param>
-        public void ValidateWeapon(Weapon Weapon)
+        /// <param name="Weapon"></param>
+        public string EquipWeapon(Weapon Weapon)
         {
             if (AllowedWeapons.Contains(Weapon.WeaponType) && Level >= Weapon.ItemLevel)
             {
                 Equipment[Weapon.ItemSlot] = Weapon;
-                Console.WriteLine("New weapon equipped!");
+
+                return "New weapon equipped!";
             }
-            else
-            {
-                throw new InvalidWeaponException("You are not able to use this weapon");
-            }
+
+            throw new InvalidWeaponException("You are not able to use this weapon");
         }
 
         /// <summary>
@@ -139,17 +97,17 @@ namespace RPG
         /// <returns>Returns WeaponDPS</returns>
         public double CalcWeaponDPS()
         {
-            double WeaponDPS = 1;
+            double weaponDPS = 1;
             Weapon weapon = Equipment.Where(item => item.Key == ArmorSlots.WEAPON).Select(item => item.Value as Weapon).FirstOrDefault();
 
-            if (weapon.ItemName != null)
+            if (weapon != null)
             {
-                double WeaponSpeed = weapon.WeaponAttributes.AttackSpeed;
-                int WeaponDamage = weapon.WeaponAttributes.Damage;
-                WeaponDPS = WeaponDamage * WeaponSpeed;
+                double weaponSpeed = weapon.WeaponAttributes.AttackSpeed;
+                int weaponDamage = weapon.WeaponAttributes.Damage;
+                weaponDPS = weaponDamage * weaponSpeed;
             }
 
-            return WeaponDPS;
+            return weaponDPS;
         }
 
         /// <summary>
@@ -192,38 +150,13 @@ namespace RPG
 
             foreach (Armor armor in armors)
             {
-                if(armor.ItemName != null)
+                if (armor != null)
                 {
                     calculatedStats += armor.ArmorAttributes;
                 }
             }
 
             return calculatedStats;
-        }
-
-        /// <summary>
-        /// Prints the characters stats to the console.
-        /// </summary>
-        public void CharacterStats()
-        {
-            CalcDamage();
-            CalcSecondaryAttributes();
-            PrimaryAttributes totalAttributes = CalcTotalAttributes();
-
-            StringBuilder Stats = new StringBuilder();
-            Stats.AppendLine("Character stats: ");
-            Stats.AppendLine("Name: " + Name);
-            Stats.AppendLine("Level: " + Level);
-            Stats.AppendLine("Vitality: " + totalAttributes.Vitality);
-            Stats.AppendLine("Strength: " + totalAttributes.Strength);
-            Stats.AppendLine("Dexterity: " + totalAttributes.Dexterity);
-            Stats.AppendLine("Intelligence: " + totalAttributes.Intelligence);
-            Stats.AppendLine("Health: " + SecondaryAttributes.Health);
-            Stats.AppendLine("Armor Rating: " + SecondaryAttributes.ArmorRating);
-            Stats.AppendLine("Elemental Resistance: " + SecondaryAttributes.ElementalResistance);
-            Stats.AppendLine("DPS: " + Damage);
-
-            Console.WriteLine(Stats);
         }
     }
 }
