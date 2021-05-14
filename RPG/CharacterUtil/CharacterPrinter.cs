@@ -8,12 +8,6 @@ namespace RPG
 {
     public class CharacterPrinter
     {
-
-        public static void PrintEquipMessage(string message)
-        {
-            Console.WriteLine(message);
-        }
-
         /// <summary>
         /// Prints the characters stats to the console.
         /// </summary>

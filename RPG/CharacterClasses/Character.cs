@@ -60,14 +60,19 @@ namespace RPG
         /// <param name="Armor"></param>
         public string EquipArmor(Armor Armor)
         {
-            if (AllowedArmor.Contains(Armor.ArmorType) && Level >= Armor.ItemLevel)
+            if (Armor.ItemLevel > Level)
             {
-                Equipment[Armor.ItemSlot] = Armor;
-
-                return "New armor equipped!";
+                throw new InvalidArmorException("You are not high enough level to wear this armor");
             }
 
-            throw new InvalidArmorException("You are not able to use this Armor");
+            if (!AllowedArmor.Contains(Armor.ArmorType))
+            {
+                throw new InvalidArmorException("You are not able to use this Armor");
+            }
+
+            Equipment[Armor.ItemSlot] = Armor;
+
+            return "New armor equipped!";
         }
 
         /// <summary>
@@ -79,14 +84,19 @@ namespace RPG
         /// <param name="Weapon"></param>
         public string EquipWeapon(Weapon Weapon)
         {
-            if (AllowedWeapons.Contains(Weapon.WeaponType) && Level >= Weapon.ItemLevel)
+            if (Weapon.ItemLevel > Level)
             {
-                Equipment[Weapon.ItemSlot] = Weapon;
-
-                return "New weapon equipped!";
+                throw new InvalidWeaponException("You are not high enough level to wear this weapon");
             }
 
-            throw new InvalidWeaponException("You are not able to use this weapon");
+            if (!AllowedWeapons.Contains(Weapon.WeaponType))
+            {
+                throw new InvalidWeaponException("You are not able to use this weapon");
+            }
+
+            Equipment[Weapon.ItemSlot] = Weapon;
+
+            return "New weapon equipped!";
         }
 
         /// <summary>

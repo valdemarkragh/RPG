@@ -18,11 +18,12 @@ namespace RPG
             };
             try
             {
-                CharacterPrinter.PrintEquipMessage(warrior.EquipArmor(testPlateBody));
+                string equipResponse = warrior.EquipArmor(testPlateBody);
+                Console.WriteLine(equipResponse);
             }
             catch (InvalidArmorException ex)
             {
-                CharacterPrinter.PrintEquipMessage(ex.Message);
+                Console.WriteLine(ex.Message);
             }
 
             CharacterPrinter.PrintCharacterInfo(warrior);
